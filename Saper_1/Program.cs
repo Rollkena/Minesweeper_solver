@@ -34,8 +34,8 @@ namespace Saper_1
                 {
                     case "1":
                         driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[1]/a")).Click();
-                        n = 9;
                         m = 9;
+                        n = 9;
                         break;
 
                     case "2":
@@ -52,15 +52,25 @@ namespace Saper_1
                 }
                 //запуск браузера, выбор сложности
                 Thread.Sleep(2000);
-                //int[,] matri = New_Matrix(n,m,driver);
-                //for (int i = 0; i < n; i++)
-                //{
-                //    for (int j = 0; j < m; j++)
-                //    {
-                //        Console.Write($"{matri[i, j]} ");
-                //    }
-                //    Console.Write($"\n");
-                //}
+
+                Random rnd = new Random();
+                driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd.Next(0, n)}_{rnd.Next(0, m)}\"]")).Click();
+                //первый ход случайный
+
+
+                int[,] matri = New_Matrix(n,m,driver);
+                for (int i = 0; i < n; i++)
+                {
+                    for (int j = 0; j < m; j++)
+                    {
+                        Console.Write("{0,3}", matri[i, j]);
+                    }
+                    Console.Write($"\n");
+                }
+                
+
+
+
             }
             catch (Exception ex)
             {
@@ -80,11 +90,11 @@ namespace Saper_1
                     string status = elem.GetAttribute("class");
                     if (status.Contains("closed"))
                     {
-                        matrix[i, j] = -1;
+                        matrix[j, i] = -1;
                     }
                     else if (status.Contains("opened"))
                     {
-                        matrix[i, j] = (int)status[status.Length - 1];
+                        matrix[j, i] = (int)(status[status.Length - 1] - '0');
                     }
                 }
             }
