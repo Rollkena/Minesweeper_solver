@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -19,7 +20,7 @@ namespace Saper_1
             {
                 Console.WriteLine("Проверьте корректность ввода.");
             }
-            //выбор сложности
+            //запрос сложности
 
             try
             {
@@ -49,46 +50,45 @@ namespace Saper_1
                         m = 16;
                         break;
                 }
-                IWebElement elem;
-
-                int[,] matri = new int[n, m];
-                for (int i = 0; i <= n; i++)
-                {
-                    for(int j = 0; j <= m; j++)
-                    {
-                        elem = driver.FindElement(By.Id($"cell_{n - 1}_{m - 1}"));
-                        string status = elem.GetAttribute("class");
-                        if (status.Contains("closed"))
-                        {
-                            matri[n,m] = -1;
-                        }
-                        else if (status.Contains("opened"))
-                        {
-                            matri[n,m] = (int)status[status.Length - 1];
-                        }
-                    }
-                }
-                for (int i = 0; i <= (n * m); i++)
-                {
-                    for (int j = 0; j <= m; j++)
-                    {
-                        Console.WriteLine(matri[n, m]);
-                    }
-                }
-
-
-
-
+                //запуск браузера, выбор сложности
+                Thread.Sleep(2000);
+                //int[,] matri = New_Matrix(n,m,driver);
+                //for (int i = 0; i < n; i++)
+                //{
+                //    for (int j = 0; j < m; j++)
+                //    {
+                //        Console.Write($"{matri[i, j]} ");
+                //    }
+                //    Console.Write($"\n");
+                //}
             }
             catch (Exception ex)
             {
-                //Console.WriteLine($"Что-то не так\n( • ᴖ • ｡)");
                 Console.WriteLine($"Что-то не так\n( • ᴖ • ｡) {ex.ToString()}");
             }
-            //открытие браузера + выбор сложности
+        }
 
-            
+        private static int[,] New_Matrix(int n, int m, IWebDriver driver)
+        {
+            IWebElement elem;
+            int[,] matrix = new int[n, m];
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    elem = driver.FindElement(By.XPath($"//*[@id=\"cell_{i}_{j}\"]"));
+                    string status = elem.GetAttribute("class");
+                    if (status.Contains("closed"))
+                    {
+                        matrix[i, j] = -1;
+                    }
+                    else if (status.Contains("opened"))
+                    {
+                        matrix[i, j] = (int)status[status.Length - 1];
+                    }
+                }
+            }
+            return (matrix);
         }
     }
-
 }
