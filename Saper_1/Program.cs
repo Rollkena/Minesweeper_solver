@@ -11,31 +11,19 @@ namespace Saper_1
         public static int n;
         public static int m;
         public static IWebDriver driver;
+        public static int count;
         static void Main(string[] args)
         {
+            //выбор режима игры
             int us_choise;
             Console.WriteLine("ВЫберите режим сапера:\n1 - Стандартный режим\n2 - Режим без угадывания");
             while (!(int.TryParse(Console.ReadLine(), out us_choise)) && (us_choise >= 1 && us_choise <= 2))
             {
                 Console.WriteLine("Проверьте корректность ввода.");
             }
-            switch (us_choise)
-            {
-                case 1:
-
-                case 2:
-
-            }
 
             string us_answ;
             int num_ans;
-
-            //запрос сложности
-            Console.WriteLine("Введите уровень сапера:\n1 - Beginner\n2 - Intermediate\n3 - Expert");
-            while (!((us_answ = Console.ReadLine()) != null && int.TryParse(us_answ, out num_ans) == true && (num_ans >= 1 && num_ans <= 3))) 
-            {
-                Console.WriteLine("Проверьте корректность ввода.");
-            }
 
             //запуск браузера, выбор сложности
             try
@@ -44,53 +32,128 @@ namespace Saper_1
                 chromeOptions.BinaryLocation = "D:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
                 //chromeOptions.AddArgument("--headless");
                 driver = new OpenQA.Selenium.Chrome.ChromeDriver(chromeOptions);
-                driver.Navigate().GoToUrl("https://minesweeper.online");
+
+                //стандартный режим
+                if (us_choise == 1)
+                {
+                    driver.Navigate().GoToUrl("https://minesweeper.online");
+                    //запрос сложности
+                    Console.WriteLine("Введите уровень сапера:\n1 - Beginner\n2 - Intermediate\n3 - Expert\n");
+                    while (!((us_answ = Console.ReadLine()) != null && int.TryParse(us_answ, out num_ans) == true && (num_ans >= 1 && num_ans <= 3)))
+                    {
+                        Console.WriteLine("Проверьте корректность ввода.\n");
+                    }
+
+                    switch (us_answ)
+                    {
+                        case "1":
+                            driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[1]/a")).Click();
+                            n = 9;
+                            m = 9;
+                            break;
+
+                        case "2":
+                            driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[2]/a")).Click();
+                            n = 16;
+                            m = 16;
+                            break;
+
+                        case "3":
+                            driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[3]/a")).Click();
+                            n = 30;
+                            m = 16;
+                            break;
+                    }
+                }
+                else
+                {
+                    driver.Navigate().GoToUrl("https://minesweeper.online/ru/new-game/ng");
+                    //запрос сложности
+                    Console.WriteLine("Введите уровень сапера:\n1 - Beginner\n2 - Intermediate\n3 - Expert\n4 - Evil\n");
+                    while (!((us_answ = Console.ReadLine()) != null && int.TryParse(us_answ, out num_ans) == true && (num_ans >= 1 && num_ans <= 4)))
+                    {
+                        Console.WriteLine("Проверьте корректность ввода.");
+                    }
+                    
+                    switch (us_answ)
+                    {
+                        case "1":
+                            driver.FindElement(By.XPath("//*[@id=\"level_select_11\"]/span")).Click();
+                            n = 9;
+                            m = 9;
+                            break;
+
+                        case "2":
+                            driver.FindElement(By.XPath("//*[@id=\"level_select_12\"]/span")).Click();
+                            n = 16;
+                            m = 16;
+                            break;
+
+                        case "3":
+                            driver.FindElement(By.XPath("//*[@id=\"level_select_13\"]/span")).Click();
+                            n = 30;
+                            m = 16;
+                            break;
+                        case "4":
+                            driver.FindElement(By.XPath("//*[@id=\"level_select_14\"]/span")).Click();
+                            n = 30;
+                            m = 20;
+                            break;
+                    }
+                    Thread.Sleep(1000);
+                    driver.FindElement(By.XPath($"//*[contains(@class, 'cell size24 hd_closed start')]")).Click();
+                }
+
                 //driver.Manage().Window.Maximize();
 
-                switch (us_answ)
-                {
-                    case "1":
-                        driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[1]/a")).Click();
-                        n = 9;
-                        m = 9;
-                        break;
-
-                    case "2":
-                        driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[2]/a")).Click();
-                        n = 16;
-                        m = 16;
-                        break;
-
-                    case "3":
-                        driver.FindElement(By.XPath("//*[@id=\"homepage\"]/div[1]/div[3]/a")).Click();
-                        n = 30;
-                        m = 16;
-                        break;
-                }
+                
 
                 //время на прогрузку страницы
                 Thread.Sleep(2000);
 
                 //играем пока играется
+                count = -1;
                 while (driver.FindElement(By.XPath($"//*[@id=\"top_area_face\"]")).GetAttribute("class").Contains("unpressed"))
                 {
-                    int count = 0;
-                    //открываем до скопления
-                    while (count != -1)
+                    //стандартный режим
+                    if(us_choise == 1)
                     {
-                        Random rnd = new Random();
-                        int rnd_n = rnd.Next(0, n - 1);
-                        int rnd_m = rnd.Next(0, m - 1);
-                        driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd_n}_{rnd_m}\"]")).Click();
-                        string status = driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd_n}_{rnd_m}\"]")).GetAttribute("class");
-                        if ((status[status.Length - 1] - '0' == 0)) count = -1;
+                        //открываем до скопления
+                        while (count == -1 || count == 0)
+                        {
+                            Random rnd = new Random();
+                            int rnd_n = rnd.Next(0, n - 1);
+                            int rnd_m = rnd.Next(0, m - 1);
+                            driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd_n}_{rnd_m}\"]")).Click();
+                            string status = driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd_n}_{rnd_m}\"]")).GetAttribute("class");
+                            if ((status[status.Length - 1] - '0' == 0)) count = 0;
+                        }
                     }
+                    //основной повторяющийся алгоритм
+                    count = 0;
                     Obvious_Moves(New_Matrix());
+                    int[,] matrix = Obvious_Moves(New_Matrix());
+
+                    //без угадывания
+                    if(us_choise == 2)
+                    {
+                        while (count == 0)
+                        {
+                            Random rnd = new Random();
+                            int rnd_n = rnd.Next(0, n - 1);
+                            int rnd_m = rnd.Next(0, m - 1);
+                            if(matrix[rnd_m,rnd_n] == -1)
+                            {
+                                driver.FindElement(By.XPath($"//*[@id=\"cell_{rnd_n}_{rnd_m}\"]")).Click();
+                                count++;
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"\n\nЧто-то не так\n( • ᴖ • ｡) {ex.ToString()}\n\n");
+                Console.WriteLine($"\n\nЧто-то не так\n(о _ о )\n {ex.ToString()}\n\n");
             }
 
             //проверяет существуют ли клетки (для отброса клеток у границ)
@@ -119,7 +182,7 @@ namespace Saper_1
             }
 
             //мины == количество в клетке -> ставим флаг
-            static int[,] Mines_Eq_Value(int col, int row, int[,] matrix)
+            static int[,] Set_Flag(int col, int row, int[,] matrix)
             {
                 Actions actions = new Actions(driver);
                 for (int a = -1; a < 2; a++)
@@ -130,6 +193,7 @@ namespace Saper_1
                         {
                             actions.ContextClick(driver.FindElement(By.XPath($"//*[@id=\"cell_{row + b}_{col + a}\"]"))).Perform();
                             matrix[col + a, row + b] = -5;
+                            count++;
                         }
                     }
                 }
@@ -147,6 +211,7 @@ namespace Saper_1
                         {
                             driver.FindElement(By.XPath($"//*[@id=\"cell_{row + b}_{col + a}\"]")).Click();
                             matrix = New_Matrix();
+                            count++;
                         }
                     }
                 }
@@ -178,20 +243,31 @@ namespace Saper_1
             }
 
             //очевидные решения
-            static void Obvious_Moves(int[,] matrix)
+            static int[,] Obvious_Moves(int[,] matrix)
             {
                 for (int i = 0; i < m; i++)
                 {
                     for (int j = 0; j < n; j++)
                     {
                         if (matrix[i, j] > 0 && matrix[i, j] == (Unrevealed_Count(i, j, matrix)[0] + Unrevealed_Count(i, j, matrix)[1]))
-                            matrix = Mines_Eq_Value(i, j, matrix);
-                        if (matrix[i, j] > 0 && matrix[i, j] == Unrevealed_Count(i, j, matrix)[1])
-                            matrix = Revel_Cell(i, j, matrix);
+                        {
+                            matrix = Set_Flag(i, j, matrix);
+                        }
                         //if (matrix[i, j] == 2)
                         //    matrix = Cells_1_2_1(i, j, matrix);
                     }
                 }
+                for (int i = 0; i < m; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (matrix[i, j] > 0 && matrix[i, j] == Unrevealed_Count(i, j, matrix)[1])
+                        {
+                            matrix = Revel_Cell(i, j, matrix);
+                        }
+                    }
+                }
+                return (matrix);
             }
 
             // считывание матрицы значений поля в данный момент в двумерный массив
